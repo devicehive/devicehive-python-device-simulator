@@ -1,0 +1,12 @@
+{
+  "devices": 5,
+  "url": "http://playground-dev.devicehive.com/api/rest",
+  "access_token": "YOUR_ACCESS_TOKEN_HERE",
+  "message_payload": {
+    "key1": "value1",
+    "key2": "value2",
+    "key3": {
+      "key4": "value4"
+    }
+  }
+}
