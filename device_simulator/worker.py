@@ -18,15 +18,29 @@ import json
 import time
 import logging
 import threading
+import random
+from functools import partial
+from string import Template
 
 from devicehive import Handler, DeviceHive
+from .utils import Template
 
 
 __all__ = ['Worker']
 logger = logging.getLogger(__name__)
+random.seed()
+
+
+PAYLOAD = {
+    'timestamp': time.time,
+    'random': random.random,
+    'randint': partial(random.randrange, 4294967295),
+    'randbit': partial(random.getrandbits, 1)
+}
 
 
 class WorkerHandler(Handler):
+
     def __init__(self, api):
         super(WorkerHandler, self).__init__(api)
         self._connected = False
@@ -40,6 +54,7 @@ class WorkerHandler(Handler):
 
 
 class Worker(threading.Thread):
+
     def __init__(self, supervisor, url, message_type, message_name,
                  message_payload, base_device_name, thread_index,
                  access_token=None, refresh_token=None, delay=1.,
@@ -50,7 +65,7 @@ class Worker(threading.Thread):
         self._url = url
         self._message_type = message_type
         self._message_name = message_name
-        self._message_payload = json.loads(message_payload)
+        self._message_template = Template(message_payload)
         self._device_name = base_device_name + str(thread_index)
         self._access_token = access_token
         self._refresh_token = refresh_token
@@ -77,6 +92,9 @@ class Worker(threading.Thread):
         self._payload_method = getattr(self._device, method_name)
         self._last_message_time = time.time()
 
+    def _get_payload(self):
+        return json.loads(self._message_template.render(**PAYLOAD))
+
     def _send_message(self):
         start = time.time()
         last_sent = start - self._last_message_time
@@ -84,7 +102,7 @@ class Worker(threading.Thread):
             logger.warning('Previous message was sent %s seconds ago.',
                            last_sent)
 
-        self._payload_method(self._message_name, self._message_payload)
+        self._payload_method(self._message_name, self._get_payload())
 
         now = time.time()
         message_time = now - start

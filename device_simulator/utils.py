@@ -18,10 +18,11 @@ import json
 import threading
 from collections import OrderedDict
 
+import re
 from configargparse import ConfigFileParserException, ConfigFileParser
 
 
-__all__ = ['AtomicCounter', 'JSONConfigFileParser']
+__all__ = ['AtomicCounter', 'JSONConfigFileParser', 'Template']
 
 
 class AtomicCounter(object):
@@ -68,3 +69,23 @@ class JSONConfigFileParser(ConfigFileParser):
     def serialize(self, items):
         items = dict(items)
         return json.dumps(items)
+
+
+class Template(object):
+    pattern = re.compile(r'"\$(?P<named>[_a-z][_a-z0-9]*)"', re.VERBOSE)
+
+    def __init__(self, template):
+        self._template = template
+
+    def render(self, **mapping):
+        def convert(mo):
+            named = mo.group('named')
+            if named is not None and named in mapping:
+                value = mapping[named]
+                if callable(value):
+                    value = value()
+
+                return str(value)
+
+            return mo.group()
+        return self.pattern.sub(convert, self._template)

@@ -12,11 +12,11 @@ pip install -r requirements.txt
 
 ## Configuration
 Each argument can be passed to script in three different ways:
-* Specified as command line argument (priority 1)
-* Specified as environment variable (priority 2)
-* Specified in config file (priority 3)
+* Specified as command line argument (priority 0)
+* Specified as environment variable (priority 1)
+* Specified in config file (priority 2)
 
-_Note: If argument specified in more than one place it will be used according to priority_
+_Note: If argument specified in more than one place it will be used according to priority._
 
 ### Available arguments
 * `devices` Number of devices to simulate. Default is 1.
@@ -50,6 +50,43 @@ Config file uses JSON syntax.
 Path to config file can be specified by command line argument `--config` or by environment variable `DHDS_CONFIG`
 
 [Here](config_example.json) you can found simple config example.
+
+### Payload template
+Next variables can be rendered to message payload to provide more entropy.
+* `timestamp` Current system timestamp.
+* `random` Random float number from 0 to 1.
+* `randint` Random int number from 0 to 4294967295.
+* `randbit` Random int number from 0 to 1.
+
+Variables can be used in format "$var_name" e.g.
+```json
+"message_payload": {
+  "timestamp": "$timestamp",
+  "state": {
+    "0": "$randbit",
+    "1": "$randbit",
+    "2": "$randbit",
+    "3": "$randbit",
+    "4": "$randbit"
+  },
+  "tick": "$randint"
+}
+```
+
+Will be rendered to
+```json
+"message_payload": {
+  "timestamp": 1518784534.793083,
+  "state":{
+    "0": 1,
+    "1": 0,
+    "2": 1,
+    "3": 1,
+    "4": 0
+  },
+  "tick": 4234282600
+}
+```
 
 ## Usage
 This tool can be run using python 2.7+

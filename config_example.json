@@ -3,10 +3,14 @@
   "url": "http://playground-dev.devicehive.com/api/rest",
   "access_token": "YOUR_ACCESS_TOKEN_HERE",
   "message_payload": {
-    "key1": "value1",
-    "key2": "value2",
-    "key3": {
-      "key4": "value4"
-    }
+    "timestamp": "$timestamp",
+    "state": {
+      "0": "$randbit",
+      "1": "$randbit",
+      "2": "$randbit",
+      "3": "$randbit",
+      "4": "$randbit"
+    },
+    "tick": "$randint"
   }
 }
