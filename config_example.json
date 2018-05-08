@@ -1,6 +1,6 @@
 {
   "devices": 5,
-  "url": "http://playground-dev.devicehive.com/api/rest",
+  "url": "http://playground.devicehive.com/api/rest",
   "access_token": "YOUR_ACCESS_TOKEN_HERE",
   "message_payload": {
     "timestamp": "$timestamp",
